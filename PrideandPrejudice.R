@@ -7,9 +7,6 @@ library(grid)
 
 setwd("/Users/josetorres/Desktop/UPenn/RBSI 2024/Final Project/Data/")
 
-
-##
-
 dat <- import("pewatp58.csv")
 
 dat <- dat %>%
