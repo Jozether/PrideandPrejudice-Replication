@@ -5,17 +5,18 @@ library(psych)
 library(gridExtra)
 library(grid)
 
-setwd("/Users/josetorres/Desktop/UPenn/RBSI 2024/Final Project/Data/")
+setwd("/Users/josetorres/Desktop/UPenn/RBSI 2024/Final Project/PrideandPrejudice/PrideandPrejudice-Replication/")
 
-dat <- import("pewatp58.csv")
+dat <- import("pewatp58.csv") # importing PEW ATP Panel 58
 
 dat <- dat %>%
-  filter(f_party_ != "Refused",
-         f_educca != "Refused",
-         f_sex != "Refused",
-         f_agecat != "Refused",
-         worrydpo != "Refused",
-         knowdpor != "Refused") %>%
+  filter(f_party_ != "Refused", # removing NAs
+         f_educca != "Refused", # removing NAs
+         f_sex != "Refused", # removing NAs
+         f_agecat != "Refused", # removing NAs
+         worrydpo != "Refused", # removing NAs
+         knowdpor != "Refused") %>% # removing NAs
+  # selecting important variables
   select(hisporig, hispor_2, hispor_3, hispor_4, hispor_5, hispor_6,
          hispor_7, hispor_8, hispor_9, identerm, immburdn, immval_a, immval_b,
          immval_c, immval_d, immval_e, daca2018, asylumre, lan1_w58, idenchg_,
@@ -25,109 +26,101 @@ dat <- dat %>%
          hispdi_4, weight_w, citizen_)
 
 dat <- dat %>%
-  mutate(talk_abt_hispanic_pride = case_when(idenchg_ == "I have never done this" ~ -2,
+  mutate(talk_abt_hispanic_pride = case_when(idenchg_ == "I have never done this" ~ -2, # operationalizing identity variable
                                              idenchg_ == "Less often" ~ -1,
                                              idenchg_ == "About the same000000" ~ 0,
                                              idenchg_ == "More often" ~ 1,
                                              idenchg_ == "Refused" ~ NA),
-         self_idenity = case_when(identerm == "Hispanic or Latino" ~ 1,
+         self_idenity = case_when(identerm == "Hispanic or Latino" ~ 1, # operationalizing identity variable
                                   identerm == "Country of Hispanic origin" ~ 1,
                                   identerm == "American" ~ 0,
                                   identerm == "Refused" ~ NA),
-         wear_hispanic_clothing = case_when(idench_1== "I have never done this" ~ -2,
+         wear_hispanic_clothing = case_when(idench_1== "I have never done this" ~ -2, # operationalizing identity variable
                                             idench_1 == "Less often" ~ -1,
                                             idench_1 == "About the same000000" ~ 0,
                                             idench_1 == "More often" ~ 1,
                                             idench_1 == "Refused" ~ NA),
-         speak_spanish_public = case_when(idench_2 == "I have never done this" ~ -2,
+         speak_spanish_public = case_when(idench_2 == "I have never done this" ~ -2, # operationalizing identity variable
                                           idench_2 == "Less often" ~ -1,
                                           idench_2 == "About the same000000" ~ 0,
                                           idench_2 == "More often" ~ 1,
                                           idench_2 == "Refused" ~ NA),
-         talk_abt_american_pride = case_when(idench_4 == "I have never done this" ~ -2,
+         talk_abt_american_pride = case_when(idench_4 == "I have never done this" ~ -2, # operationalizing identity variable
                                              idench_4 == "Less often" ~ -1,
                                              idench_4 == "About the same000000" ~ 0,
                                              idench_4 == "More often" ~ 1,
                                              idench_4 == "Refused" ~ NA),
-         wear_american_clothing = case_when(idench_3 == "I have never done this" ~ -2,
+         wear_american_clothing = case_when(idench_3 == "I have never done this" ~ -2, # operationalizing identity variable
                                             idench_3 == "Less often" ~ -1,
                                             idench_3 == "About the same000000" ~ 0,
                                             idench_3 == "More often" ~ 1,
                                             idench_3 == "Refused" ~ NA),
-         speak_only_english = case_when(idench_5 == "I have never done this" ~ -2,
+         speak_only_english = case_when(idench_5 == "I have never done this" ~ -2, # operationalizing identity variable
                                         idench_5 == "Less often" ~ -1,
                                         idench_5 == "About the same000000" ~ 0,
                                         idench_5 == "More often" ~ 1,
                                         idench_5 == "Refused" ~ NA),
-         linked_fate = case_when(racesurv == "A lot" ~ 2,
+         linked_fate = case_when(racesurv == "A lot" ~ 2, # operationalizing control variable
                                  racesurv == "Some" ~ 1,
                                  racesurv == "Not much" ~ 0,
                                  racesurv == "Not at all" ~ -1,
                                  racesurv == "Refused" ~ NA),
-         immburdn = case_when(immburdn == "Immigrants today are a burden on our country because they take our jobs, housing and health care" ~ 1,
+         immburdn = case_when(immburdn == "Immigrants today are a burden on our country because they take our jobs, housing and health care" ~ 1, # operationalizing immigration attitudes
                               immburdn == "Immigrants today strengthen our country because of their hard work and talents" ~ 0,
                               immburdn == "Refused" ~ NA),
-         immval_a = case_when(immval_a == "Very important goal" ~ 2,
+         immval_a = case_when(immval_a == "Very important goal" ~ 2, # operationalizing immigration attitudes
                               immval_a == "Somewhat important goal" ~ 1,
                               immval_a == "Refused" ~ NA,
                               immval_a == "Not too important goal" ~ -1,
                               immval_a == "Not at all important goal" ~ -2),
-         immval_b = case_when(immval_b == "Very important goal" ~ 2,
+         immval_b = case_when(immval_b == "Very important goal" ~ 2, # operationalizing immigration attitudes
                               immval_b == "Somewhat important goal" ~ 1,
                               immval_b == "Refused" ~ NA,
                               immval_b == "Not too important goal" ~ -1,
                               immval_b == "Not at all important goal" ~ -2),
-         immval_c = case_when(immval_c == "Very important goal" ~ 2,
+         immval_c = case_when(immval_c == "Very important goal" ~ 2, # operationalizing immigration attitudes
                               immval_c == "Somewhat important goal" ~ 1,
                               immval_c == "Refused" ~ NA,
                               immval_c == "Not too important goal" ~ -1,
                               immval_c == "Not at all important goal" ~ -2),
-         immval_d = case_when(immval_d == "Very important goal" ~ 2,
+         immval_d = case_when(immval_d == "Very important goal" ~ 2, # operationalizing immigration attitudes
                               immval_d == "Somewhat important goal" ~ 1,
                               immval_d == "Refused" ~ NA,
                               immval_d == "Not too important goal" ~ -1,
                               immval_d == "Not at all important goal" ~ -2),
-         immval_e = case_when(immval_e == "Very important goal" ~ 2,
+         immval_e = case_when(immval_e == "Very important goal" ~ 2, # operationalizing immigration attitudes
                               immval_e == "Somewhat important goal" ~ 1,
                               immval_e == "Refused" ~ NA,
                               immval_e == "Not too important goal" ~ -1,
                               immval_e == "Not at all important goal" ~ -2),
-         daca2018 = case_when(daca2018 == "Favor" ~ 1,
+         daca2018 = case_when(daca2018 == "Favor" ~ 1, # operationalizing immigration attitudes
                               daca2018 == "Oppose" ~ 0,
                               daca2018 == "Refused" ~ NA),
-         asylumre = case_when(asylumre == "No, the U.S. does not have this responsibility" ~ 0,
+         asylumre = case_when(asylumre == "No, the U.S. does not have this responsibility" ~ 0, # operationalizing immigration attitudes
                               asylumre == "Refused" ~ NA,
                               asylumre == "Yes, the U.S. has this responsibility" ~ 1),
-         pd1 = case_when(hispdisc == "No, has not happened" ~ 0,
+         pd1 = case_when(hispdisc == "No, has not happened" ~ 0, # operationalizing perceived discrimination variable
                          hispdisc == "Yes, has happened" ~ 1),
-         pd2 = case_when(hispdi_1 == "No, has not happened" ~ 0,
+         pd2 = case_when(hispdi_1 == "No, has not happened" ~ 0, # operationalizing perceived discrimination variable
                          hispdi_1 == "Yes, has happened" ~ 1),
-         pd3 = case_when(hispdi_2 == "No, has not happened" ~ 0,
+         pd3 = case_when(hispdi_2 == "No, has not happened" ~ 0, # operationalizing perceived discrimination variable
                          hispdi_2 == "Yes, has happened" ~ 1),
-         pd4 = case_when(hispdi_3 == "No, has not happened" ~ 0,
+         pd4 = case_when(hispdi_3 == "No, has not happened" ~ 0, # operationalizing perceived discrimination variable
                          hispdi_3 == "Yes, has happened" ~ 1),
-         pd5 = case_when(hispdi_4 == "No, has not happened" ~ 0,
+         pd5 = case_when(hispdi_4 == "No, has not happened" ~ 0, # operationalizing perceived discrimination variable
                          hispdi_4 == "Yes, has happened" ~ 1)) %>%
+  # removing non-responses
   drop_na(talk_abt_hispanic_pride, wear_hispanic_clothing, speak_spanish_public, linked_fate) %>%
+  # creating hispanic and american ID comfort scores and perceived discrimination score
   mutate(hispanic_comfort = talk_abt_hispanic_pride + wear_hispanic_clothing + speak_spanish_public,
-         hispanic_comfort1 = talk_abt_hispanic_pride + wear_hispanic_clothing + speak_spanish_public,
-         hispanic_comfort = scale(hispanic_comfort),
+         #hispanic_comfort = scale(hispanic_comfort), # scaling variable
          american_comfort = talk_abt_american_pride + wear_american_clothing + speak_only_english,
-         american_comfort1 = talk_abt_american_pride + wear_american_clothing + speak_only_english,
-         american_comfort = scale(american_comfort),
+         #american_comfort = scale(american_comfort), # scaling variable
+         differenceID = american_comfort - hispanic_comfort,
          pd = pd1 + pd2 + pd3 +pd4 + pd5) %>%
   select(hispanic_comfort, immburdn, immval_a, immval_b, immval_c, immval_d, immval_e, daca2018, asylumre, worrydpo,
          racesu_1, f_party_, f_educca, f_sex, f_agecat, talk_abt_hispanic_pride, self_idenity, wear_hispanic_clothing, speak_spanish_public,
-         linked_fate, wear_american_clothing, talk_abt_american_pride, american_comfort, pd, worrydpo, knowdpor, weight_w, citizen_, hispanic_comfort1, american_comfort1)
-
-# Cronbach's alpha for hispanic comfort score
-alpha <- dat %>%
-  select(talk_abt_hispanic_pride, wear_hispanic_clothing)
-alpha(alpha)
-
-#averages
-
-mean(dat$american_comfort1, na.rm = T)
+         linked_fate, wear_american_clothing, talk_abt_american_pride, american_comfort, pd, worrydpo, knowdpor, weight_w, citizen_, differenceID)
 
 # hispanic comfort score distribution
 dat %>%
@@ -171,23 +164,37 @@ dat %>%
              linetype = "dashed",
              color = "black")
 
-# discrimination experience score distribution
+# comfort score difference distribution
 dat %>%
-  ggplot(aes(x = pd)) + 
-  geom_bar(stat = "count") +
+  ggplot(aes(x = differenceID)) + 
+  geom_bar(stat = "count", width = 0.43, color = "black", fill = "gray", position = "dodge") +
   theme_bw() +
-  xlab("Discrimination Experience Score") +
+  xlab("Score") +
   ylab(" ") +
-  ggtitle("Distribution of Discrimination Experience Score") +
-  theme(axis.text = element_text(size=12),
-        axis.title = element_text(size=15),
-        title = element_text(size=15),
-        plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(n.breaks=10) +
-  geom_vline(aes(xintercept = mean(pd)), 
+  ggtitle("Distribution of difference Comfort Score") +
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 15),
+        title = element_text(size = 15),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_line(color = 'black')) +
+  scale_x_continuous(n.breaks = 10) +
+  geom_vline(aes(xintercept = mean(hispanic_comfort, na.rm = TRUE)), 
              linetype = "dashed",
-             color = "#FC4E07")
+             color = "black")
   
+### difference comfort
+summary(lm(immburdn ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Are immigrants a burden (-1) or benefit (1)
+summary(lm(immval_a ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Taking in refugees from war
+summary(lm(immval_b ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Increase deportations of illegal immigrants in US
+summary(lm(immval_c ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Establish pathway for illegal immigrants
+summary(lm(immval_d ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Increase security along border to reduce illegal crossings
+summary(lm(immval_e ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Improve the security of the country’s borders
+summary(lm(daca2018 ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Congress passing law granting dreamers legal status
+summary(lm(asylumre ~ differenceID + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # US has responsibility for Central American asylum seekers
+
 ### hispanic comfort
 # summary(lm(immburdn ~ hispanic_comfort + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Are immigrants a burden (-1) or benefit (1)
 # summary(lm(immval_a ~ hispanic_comfort + f_party_ + f_educca + f_sex + f_agecat + worrydpo + knowdpor + pd + citizen_ + linked_fate, data = dat, weights = weight_w)) # Taking in refugees from war
